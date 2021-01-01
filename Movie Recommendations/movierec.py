@@ -26,14 +26,13 @@ ratings = pd.read_csv("ratings.csv")
 tags = pd.read_csv("tags.csv")
 
 
-# In[4]:
+# In[20]:
 
 
 print(tags.shape, genomeS.shape, genomeT.shape, link.shape, movies.shape, ratings.shape)
-movies
 
 
-# In[13]:
+# In[19]:
 
 
 genres = []
@@ -57,12 +56,21 @@ newMovies = movies.drop(columns = "genres")
 df = tags.merge(newMovies, on="movieId")
 newRatings = ratings.drop(columns = "timestamp")
 df.drop(columns = ["timestamp", "tag", "title"], inplace = True)
-df
+df = df.sort_values("userId")
+
+
+# In[18]:
+
+
+
+#splitte opp dataframen min til #userId dataframes og lage
+
+def modelMakerId(df):
+    models = []
+    X = df.drop(columns = "movieId")
+    y = df["movieId"]
+    users = df["userId"]
+    for user in df["userId"]:
         
-
-
-# In[ ]:
-
-
-
+    
 
