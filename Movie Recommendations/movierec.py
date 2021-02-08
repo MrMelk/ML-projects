@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[18]:
+# In[1]:
 
 
 import pandas as pd
@@ -33,7 +33,7 @@ tags = pd.read_csv("tags.csv")
 print(tags.shape, genomeS.shape, genomeT.shape, link.shape, movies.shape, ratings.shape)
 
 
-# In[11]:
+# In[4]:
 
 
 genres = []
@@ -61,44 +61,58 @@ df = df.sort_values("userId")
 df
 
 
-# In[38]:
+# In[28]:
 
 
 
 #splitte opp dataframen min til #userId dataframes og lage
 df = df.reset_index(drop = True)
 
-def modelMakerId(df):
+
+def mm(df):
     models = []
-    X = df.drop(columns = "movieId")
-    y = df["movieId"]
     users = df["userId"]
-    for i in range(df.shape[0]):
-        if df[df["userId"] == i]:
+    pred = []
+    score = []
+    for i in range(df["userId"].max()):
+        if df[df["userId"] == i].shape[0] != 0:
             X = df[df["userId"] == i].drop(columns = ["movieId"])
-            y = df[df["userId"] == i].drop(columns = ["userId"])
-            train_test_split(X, y, test_size = 0.2)
+            y = df[df["userId"] == i]["movieId"]
+            X = X.to_numpy()
+            y = y.to_numpy()
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
             
             model = RandomForestClassifier()
-            model.fit(X, y)
-            models.append(["userId " + str(i), model])
-        #ta alle som er true når user == start user, lag modell, send inn resten
-        #bruke df[df["userId"] == x]?
-        #this currently does not work, will attempt later
-    return models
+            models.append((i, model.fit(X_train, y_train)))
+            tempPred = model.predict(X_test)
+            pred.append((i, tempPred))
+            score.append((i, accuracy_score(y_test, tempPred)))
+
+    return model, pred, score
+# X = df[df["userId"] == 14].drop(columns = ["movieId"])
+# y = df[df["userId"] == 14]["movieId"]
+# X = X.to_numpy()
+# y = y.to_numpy()
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
+
+# model = RandomForestClassifier()
+# model.fit(X_train, y_train)
+# pred = model.predict(X_test)
+# score = accuracy_score(y_test, pred)
+# score
+model, pred, score = mm(df)
 
 
-X = df[df["userId"] == 14].drop(columns = ["movieId"])
-y = df[df["userId"] == 14]["movieId"]
-X = X.to_numpy()
-y = y.to_numpy()
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
+# In[ ]:
 
-model = RandomForestClassifier()
-model.fit(X_train, y_train)
-pred = model.predict(X_test)
-score = accuracy_score(y_test, pred)
-score
+
+
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:
